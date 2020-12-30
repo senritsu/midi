@@ -1,21 +1,28 @@
 <template>
   <div :class="$style.page">
     <h2>Gamepad MIDI Input</h2>
-    <h3>Pads</h3>
-    <div :class="$style.pads">
-      <div v-for="(pad, i) in pads" :key="i" :class="$style.pad">
-        <template v-if="pad">
-          {{ pad.index }}: {{ pad.id }} ({{ pad.buttons.length }} buttons [{{ buttonStates[i].map(x => x ? '🟢' : '🔴').join('') }}], {{ pad.axes.length }} axes)
-        </template>
-        <span v-else>PAD {{ i }} MISSING</span>
+    <div :class="$style.columns">
+      <div :class="$style.column">
+        <h3>Pads</h3>
+        <div :class="$style.pads">
+          <template v-for="(pad, i) in pads">
+            <Gamepad v-if="pad" :key="`pad-${i}`" :pad="pad" @play="onPlay" />
+            <span v-else :key="`pad-${i}-disconnected`">PAD {{ i }} DISCONNECTED</span>
+          </template>
+        </div>
+        <br>
+        <span>Buttons will send their mapped note (e.g. "C3") to output <strong>{{ activeOutput }}</strong> on press</span>
       </div>
-    </div>
-    <span>Any button press will play C3 on output <strong>{{ activeOutput }}</strong></span>
-    <h3>Devices</h3>
-    <div :class="$style.devices">
-      <div v-for="(device, i) in outputs" :key="i" :class="$style.device">
-        Output {{ i }}: {{ device.id }} - {{ device.name }} ({{ device.state }}, {{ device.connection }})
-        <button @click="() => {device.playNote('C3'); activeOutput = i}">Play C3 and set as active output</button>
+
+      <div :class="$style.column">
+
+        <h3>Devices</h3>
+        <div :class="$style.devices">
+          <div v-for="(device, i) in outputs" :key="i" :class="$style.device">
+            Output {{ i }}: {{ device.id }} - {{ device.name }} ({{ device.state }}, {{ device.connection }})
+            <button @click="() => {device.playNote('C3'); activeOutput = i}">Play C3 and set as active output</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -24,11 +31,27 @@
 <script>
 import WebMidi from 'webmidi'
 
+import Gamepad from '@/components/Gamepad.vue'
+
+const clonePad = ({ id, index, buttons, axes }) => ({
+  id,
+  index,
+  buttons: buttons.map(cloneButton),
+  axes: [...axes]
+})
+
+const cloneButton = ({ value, pressed }) => ({
+  value,
+  pressed
+})
+
 export default {
+  components: {
+    Gamepad
+  },
   data () {
     return {
       pads: [],
-      buttonStates: [],
       outputs: [],
       activeOutput: 0,
       loop: false
@@ -36,37 +59,30 @@ export default {
   },
   methods: {
     refreshPads () {
-      this.pads = [...navigator.getGamepads()]
-
-      this.buttonStates = Array.from({ length: this.pads })
-
-      this.pads.forEach((pad, i) => {
-        if (pad === null) {
-          this.buttonStates[i] = []
-        } else {
-          this.buttonStates[i] = pad.buttons.map(x => x.value)
-        }
-      })
+      this.pads = [...navigator.getGamepads()].map(clonePad)
     },
     refreshButtons () {
       const pads = [...navigator.getGamepads()]
 
       pads.forEach((pad, i) => {
         if (pad === null) {
-          this.buttonStates[i] = []
-        } else {
+          this.pads[i] = null
+        } else if (pad !== null && this.pads[i] === null) {
+          this.pads[i] = clonePad(pad)
+        } else if (this.pads[i] !== null) {
           pad.buttons.forEach((button, j) => {
-            const previous = this.buttonStates[i][j]
-
-            if (!previous && button.value) {
-              this.outputs[this.activeOutput].playNote('C3', 1, {
-                velocity: button.value
-              })
-            }
-
-            this.buttonStates[i][j] = button.value
+            this.pads[i].buttons[j].value = button.value
+            this.pads[i].buttons[j].pressed = button.pressed
+          })
+          pad.axes.forEach((value, j) => {
+            this.pads[i].axes[j] = value
           })
         }
+      })
+    },
+    onPlay ({ note, velocity }) {
+      this.outputs[this.activeOutput].playNote(note, 1, {
+        velocity
       })
     },
     tick (t) {
@@ -107,6 +123,16 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.columns {
+  display: flex;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  margin: 0 2em;
 }
 
 .pads {
