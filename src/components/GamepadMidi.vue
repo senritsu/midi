@@ -13,7 +13,6 @@
         <br>
         <div :class="$style.help">
           <span>Buttons will send their mapped note (e.g. "C3") to output <strong>{{ activeOutput }}</strong> on press</span>
-          <span>Axes currently only support <em>velocity</em> as the only mapping, and will determine global note velocity if used (otherwise analog button value is used, digital buttons defaulting to max velocity)</span>
         </div>
       </div>
 
@@ -130,13 +129,14 @@ export default {
 
 .columns {
   display: flex;
+  width: 100%;
 }
 
 .column {
   display: flex;
   flex-direction: column;
   flex: 1;
-  margin: 0 2em;
+  padding: 0 2em;
 }
 .column:not(:last-child) {
   border-right: 1px solid #d5d5d5;
@@ -145,7 +145,6 @@ export default {
 .pads {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
 }
 .devices {
   display: flex;

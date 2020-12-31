@@ -59,6 +59,6 @@ export default {
 }
 
 .input {
-  width: 8em;
+  max-width: 12em; /* TODO change when improving axis mapping */
 }
 </style>
