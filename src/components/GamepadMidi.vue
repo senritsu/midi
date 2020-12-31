@@ -1,6 +1,7 @@
 <template>
   <div :class="$style.page">
-    <h2>Gamepad MIDI Input</h2>
+    <h2>Gamepad MIDI mapping</h2>
+    <h5>Prototype | source available on <a href="https://github.com/senritsu/midi">GitHub</a></h5>
     <div :class="$style.columns">
       <div :class="$style.column">
         <h3>Pads</h3>
