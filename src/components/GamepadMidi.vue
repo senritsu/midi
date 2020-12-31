@@ -11,7 +11,10 @@
           </template>
         </div>
         <br>
-        <span>Buttons will send their mapped note (e.g. "C3") to output <strong>{{ activeOutput }}</strong> on press</span>
+        <div :class="$style.help">
+          <span>Buttons will send their mapped note (e.g. "C3") to output <strong>{{ activeOutput }}</strong> on press</span>
+          <span>Axes currently only support <em>velocity</em> as the only mapping, and will determine global note velocity if used (otherwise analog button value is used, digital buttons defaulting to max velocity)</span>
+        </div>
       </div>
 
       <div :class="$style.column">
@@ -132,7 +135,11 @@ export default {
 .column {
   display: flex;
   flex-direction: column;
+  flex: 1;
   margin: 0 2em;
+}
+.column:not(:last-child) {
+  border-right: 1px solid #d5d5d5;
 }
 
 .pads {
@@ -147,5 +154,16 @@ export default {
 }
 .device {
   display: flex;
+}
+
+.help {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.help > span {
+  text-align: left;
+  margin-bottom: 0.5em;
 }
 </style>

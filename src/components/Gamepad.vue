@@ -5,18 +5,27 @@
       <button v-if="!showDetails" @click="showDetails = true">➕</button>
       <button v-else @click="showDetails = false">➖</button>
     </h4>
-    <div v-if="showDetails" :class="$style.buttons">
-      <GamepadButton
-        v-for="(button, i) in pad.buttons" :key="i"
-        :button="button" :index="i"
-        :note="buttonMapping[i]"
-        @press="onPress(i, $event)"
-        @map="onMap(i, $event)"
-      />
-    </div>
-    <div v-if="showDetails" :class="$style.axes">
-      <GamepadAxis v-for="(value, i) in pad.axes" :key="i" :value="value" :index="i" />
-    </div>
+    <template v-if="showDetails">
+      <span>Active mapping: <strong>{{ activeMappingName }}</strong> ({{ Object.keys(activeMapping).length }} mappings)</span>
+      <div :class="$style.buttons">
+        <GamepadButton
+          v-for="(button, i) in pad.buttons" :key="i"
+          :button="button" :index="i"
+          :note="activeMapping[`button-${i}`]"
+          @press="onButtonPress(i, $event)"
+          @map="onMapButton(i, $event)"
+        />
+      </div>
+      <div :class="$style.axes">
+        <GamepadAxis
+          v-for="(value, i) in pad.axes" :key="i"
+          :value="value" :index="i"
+          :control="activeMapping[`axis-${i}`]"
+          @change="onAxisChange(i, $event)"
+          @map="onMapAxis(i, $event)"
+        />
+      </div>
+    </template>
   </div>
 </template>
 
@@ -35,22 +44,64 @@ export default {
   data () {
     return {
       showDetails: false,
-      buttonMapping: {}
+      mappings: {},
+      activeMappingName: 'default',
+      velocity: null
+    }
+  },
+  computed: {
+    activeMapping () {
+      return this.mappings[this.activeMappingName] || {}
     }
   },
   methods: {
-    onMap (index, note) {
-      if (note) {
-        this.buttonMapping[index] = note
+    onMapButton (index, note) {
+      const key = `button-${index}`
+
+      this.set(key, note)
+    },
+    onMapAxis (index, control) {
+      const key = `axis-${index}`
+
+      this.set(key, control)
+    },
+    set (key, value) {
+      const mapping = this.mappings[this.activeMappingName] || (this.mappings[this.activeMappingName] = {})
+
+      if (value === null) {
+        delete mapping[key]
       } else {
-        delete this.buttonMapping[index]
+        mapping[key] = value
+      }
+
+      localStorage.setItem(`midi-mappings-${this.pad.id}`, JSON.stringify(this.mappings))
+
+      if (!Object.values(mapping).some(x => x === 'velocity')) {
+        this.velocity = null
       }
     },
-    onPress (index, value) {
-      if (this.buttonMapping[index]) {
-        this.$emit('play', { note: this.buttonMapping[index], velocity: value })
+    onButtonPress (index, value) {
+      const note = this.activeMapping[`button-${index}`]
+      if (note) {
+        const velocity = this.velocity !== null
+          ? this.velocity
+          : value
+
+        this.$emit('play', { note, velocity })
+      }
+    },
+    onAxisChange (index, value) {
+      const control = this.activeMapping[`axis-${index}`]
+
+      if (control === 'velocity') {
+        this.velocity = value * 0.5 + 0.5
       }
     }
+  },
+  mounted () {
+    const storedMappings = localStorage.getItem(`midi-mappings-${this.pad.id}`)
+
+    this.mappings = storedMappings !== null ? JSON.parse(storedMappings) : {}
   }
 }
 </script>

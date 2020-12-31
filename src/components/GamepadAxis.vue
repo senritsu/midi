@@ -4,6 +4,7 @@
     <div :class="$style.bar">
       <div :class="$style.marker" :style="{ left: `${(0.5 * value + 0.5) * 100}%`}" />
     </div>
+    <input :class="$style.input" type="text" name="note" v-model="controlModel">
   </div>
 </template>
 
@@ -11,7 +12,21 @@
 export default {
   props: {
     value: Number,
-    index: Number
+    index: Number,
+    control: String
+  },
+  computed: {
+    controlModel: {
+      get () { return this.control },
+      set (value) { this.$emit('map', value) }
+    }
+  },
+  watch: {
+    value (value, old) {
+      if (value !== old) {
+        this.$emit('change', value)
+      }
+    }
   }
 }
 </script>
@@ -41,5 +56,9 @@ export default {
   background-color: black;
   top: 0;
   left: 50%;
+}
+
+.input {
+  width: 8em;
 }
 </style>
