@@ -90,7 +90,7 @@ export default {
     set (key, value) {
       const mapping = this.mappings[this.activeMappingIndex]
 
-      if (value === null) {
+      if (!value) {
         delete mapping[key]
       } else {
         mapping[key] = value
