@@ -36,12 +36,18 @@ import WebMidi from 'webmidi'
 
 import Gamepad from '@/components/Gamepad.vue'
 
-const clonePad = ({ id, index, buttons, axes }) => ({
-  id,
-  index,
-  buttons: buttons.map(cloneButton),
-  axes: [...axes]
-})
+const clonePad = pad => {
+  if (!pad) return null
+
+  const { id, index, buttons, axes } = pad
+
+  return {
+    id,
+    index,
+    buttons: buttons.map(cloneButton),
+    axes: [...axes]
+  }
+}
 
 const cloneButton = ({ value, pressed }) => ({
   value,
