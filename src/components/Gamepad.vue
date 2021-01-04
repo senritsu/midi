@@ -44,7 +44,13 @@
           An axis mapped to the special value <strong>velocity</strong> will determine global note velocity, otherwise analog buttons set their own velocity and digital buttons always send max velocity.
         </p>
       </div>
-      <a :href="exportUrl" :download="`${pad.id}.json`">Download Mappings as JSON</a>
+      <div :class="$style.io">
+        <a :href="exportUrl" :download="`${pad.id}.json`">Download as JSON</a>
+        <span :class="$style.import">
+          <label>Import from JSON</label>
+          <input type="file" @change="importFromJson" accept="application/json" />
+        </span>
+      </div>
     </template>
   </div>
 </template>
@@ -152,8 +158,18 @@ export default {
     persist () {
       localStorage.setItem(`midi-mappings-${this.pad.id}`, JSON.stringify(this.mappings))
     },
-    import () {
+    async importFromJson (event) {
+      if (!event.target.files.length) return
 
+      const file = event.target.files.item(0)
+      const json = await file.text()
+      const mappings = JSON.parse(json)
+
+      this.mappings = mappings
+      this.activeMappingIndex = 0
+      this.persist()
+
+      event.target.value = null
     }
   },
   watch: {
@@ -228,5 +244,17 @@ export default {
   margin: 0;
   max-width: 30em; /* TODO change when improving styling */
   justify-self: center;
+}
+
+.io {
+  margin-top: 1em;
+}
+
+.io > a {
+  margin-right: 2em;
+}
+
+.io input {
+  margin-left: 0.5em;
 }
 </style>
