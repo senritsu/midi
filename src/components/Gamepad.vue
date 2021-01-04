@@ -44,6 +44,7 @@
           An axis mapped to the special value <strong>velocity</strong> will determine global note velocity, otherwise analog buttons set their own velocity and digital buttons always send max velocity.
         </p>
       </div>
+      <a :href="exportUrl" :download="`${pad.id}.json`">Download Mappings as JSON</a>
     </template>
   </div>
 </template>
@@ -74,6 +75,11 @@ export default {
     },
     mappingNames () {
       return this.mappings.map(x => x.name)
+    },
+    exportUrl () {
+      const json = JSON.stringify(this.mappings, null, 2)
+      const blob = new Blob([json], { type: 'application/json' })
+      return URL.createObjectURL(blob)
     }
   },
   methods: {
@@ -145,12 +151,25 @@ export default {
     },
     persist () {
       localStorage.setItem(`midi-mappings-${this.pad.id}`, JSON.stringify(this.mappings))
+    },
+    import () {
+
+    }
+  },
+  watch: {
+    exportUrl (url, oldUrl) {
+      if (oldUrl) {
+        URL.revokeObjectURL(oldUrl)
+      }
     }
   },
   mounted () {
     const storedMappings = localStorage.getItem(`midi-mappings-${this.pad.id}`)
 
     this.mappings = storedMappings !== null ? JSON.parse(storedMappings) : [{ name: 'default' }]
+  },
+  unmounted () {
+    URL.revokeObjectURL(this.exportUrl)
   }
 }
 </script>
