@@ -11,13 +11,13 @@ In the current prototype stage, it has only a small set of core functionality:
 - Multiple profiles per gamepad, profile switching can also be bound to gamepad buttons for quick switching
 - Persistence via `localStorage`
 - Fully client-side, no server or online communication
+- JSON import/export
 
 Additional features under consideration:
 
 - non-prototype styling/layouting/UX
 - Channel selection for midi routing
 - control channel mapping for axes
-- JSON import/export
 - Graphical representation of certain common gamepads and devices
 
 ## Project setup
