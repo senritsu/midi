@@ -56,8 +56,8 @@
 </template>
 
 <script>
-import GamepadButton from '@/components/GamepadButton.vue'
-import GamepadAxis from '@/components/GamepadAxis.vue'
+import GamepadButton from './GamepadButton.vue'
+import GamepadAxis from './GamepadAxis.vue'
 
 export default {
   components: {

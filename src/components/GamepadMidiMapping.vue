@@ -1,7 +1,6 @@
 <template>
   <div :class="$style.page">
     <h2>Gamepad MIDI mapping</h2>
-    <h5>Prototype | source available on <a href="https://github.com/senritsu/midi">GitHub</a></h5>
     <div :class="$style.columns">
       <div :class="$style.column">
         <h3>Pads</h3>
@@ -34,7 +33,7 @@
 <script>
 import WebMidi from 'webmidi'
 
-import Gamepad from '@/components/Gamepad.vue'
+import Gamepad from './Gamepad.vue'
 
 const clonePad = pad => {
   if (!pad) return null
