@@ -21,13 +21,6 @@
         />
       </div>
 
-      <MidiNoteRedirect
-        v-if="selectedInput && selectedOutput"
-        :input="inputs[selectedInput]"
-        :output="outputs[selectedOutput]"
-        :redirects="redirects"
-      />
-
       <h3>Redirects</h3>
 
       <textarea
@@ -36,6 +29,13 @@
         rows="20"
         cols="80"
         :placeholder="'# this is a comment\n# each line can contain one redirect\n# channel:note => channel:note\n2:1 => 1:1\n# channel goes from 1 to 16, note goes from 0 to 127\n1:0 => 16:127\n\n# empty lines are ok\n\n10:42 => 5:21'"
+      />
+
+      <MidiNoteRedirect
+        v-if="selectedInput && selectedOutput"
+        :input="inputs[selectedInput]"
+        :output="outputs[selectedOutput]"
+        :redirects="redirects"
       />
     </template>
     <span v-else-if="state === 'pending'">Trying to connect...</span>
