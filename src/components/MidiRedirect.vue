@@ -28,7 +28,14 @@
         :redirects="redirects"
       />
 
-      <textarea v-model="script" rows="10" cols="80" />
+      <p>redirects can be defined one per line, in the form of</p>
+      <p><strong>C:N => C:N</strong></p>
+      <p>
+        Where C is a channel number between 1 and 16 and N is a note number
+        between 0 and 127
+      </p>
+
+      <textarea class="script-input" v-model="script" rows="10" cols="80" />
     </template>
     <span v-else-if="state === 'pending'">Trying to connect...</span>
     <span v-else>Error</span>
@@ -49,7 +56,7 @@ const { state, inputs, outputs } = useWebMidi()
 const selectedInput = ref(null)
 const selectedOutput = ref(null)
 
-const script = ref('')
+const script = ref('2:1 => 1:1')
 
 const redirects = ref({})
 
