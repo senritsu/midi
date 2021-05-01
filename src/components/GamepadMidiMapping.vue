@@ -7,22 +7,37 @@
         <div :class="$style.pads">
           <template v-for="(pad, i) in pads">
             <Gamepad v-if="pad" :key="`pad-${i}`" :pad="pad" @play="onPlay" />
-            <span v-else :key="`pad-${i}-disconnected`">PAD {{ i }} DISCONNECTED</span>
+            <span v-else :key="`pad-${i}-disconnected`"
+              >PAD {{ i }} DISCONNECTED</span
+            >
           </template>
         </div>
-        <br>
+        <br />
         <div :class="$style.help">
-          <span>Buttons will send their mapped note (e.g. "C3") to output <strong>{{ activeOutput }}</strong> on press</span>
+          <span
+            >Buttons will send their mapped note (e.g. "C3") to output
+            <strong>{{ activeOutput }}</strong> on press</span
+          >
         </div>
       </div>
 
       <div :class="$style.column">
-
         <h3>Devices</h3>
         <div :class="$style.devices">
           <div v-for="(device, i) in outputs" :key="i" :class="$style.device">
-            Output {{ i }}: {{ device.id }} - {{ device.name }} ({{ device.state }}, {{ device.connection }})
-            <button @click="() => {device.playNote('C3'); activeOutput = i}">Play C3 and set as active output</button>
+            Output {{ i }}: {{ device.id }} - {{ device.name }} ({{
+              device.state
+            }}, {{ device.connection }})
+            <button
+              @click="
+                () => {
+                  device.playNote('C3')
+                  activeOutput = i
+                }
+              "
+            >
+              Play C3 and set as active output
+            </button>
           </div>
         </div>
       </div>
@@ -35,7 +50,7 @@ import WebMidi from 'webmidi'
 
 import Gamepad from './Gamepad.vue'
 
-const clonePad = pad => {
+const clonePad = (pad) => {
   if (!pad) return null
 
   const { id, index, buttons, axes } = pad
@@ -44,32 +59,32 @@ const clonePad = pad => {
     id,
     index,
     buttons: buttons.map(cloneButton),
-    axes: [...axes]
+    axes: [...axes],
   }
 }
 
 const cloneButton = ({ value, pressed }) => ({
   value,
-  pressed
+  pressed,
 })
 
 export default {
   components: {
-    Gamepad
+    Gamepad,
   },
-  data () {
+  data() {
     return {
       pads: [],
       outputs: [],
       activeOutput: 0,
-      loop: false
+      loop: false,
     }
   },
   methods: {
-    refreshPads () {
+    refreshPads() {
       this.pads = [...navigator.getGamepads()].map(clonePad)
     },
-    refreshButtons () {
+    refreshButtons() {
       const pads = [...navigator.getGamepads()]
 
       pads.forEach((pad, i) => {
@@ -88,24 +103,24 @@ export default {
         }
       })
     },
-    onPlay ({ note, velocity }) {
+    onPlay({ note, velocity }) {
       this.outputs[this.activeOutput].playNote(note, 1, {
-        velocity
+        velocity,
       })
     },
-    tick (t) {
+    tick(t) {
       if (!this.loop) return
 
       this.refreshButtons()
 
       requestAnimationFrame(this.tick)
-    }
+    },
   },
-  mounted () {
+  mounted() {
     window.addEventListener('gamepadconnected', this.refreshPads)
     window.addEventListener('gamepaddisconnected', this.refreshPads)
 
-    WebMidi.enable(error => {
+    WebMidi.enable((error) => {
       if (error) {
         console.error(error)
       } else {
@@ -117,12 +132,12 @@ export default {
     this.loop = true
     requestAnimationFrame(this.tick)
   },
-  unmounted () {
+  unmounted() {
     window.removeEventListener('gamepadconnected', this.refreshPads)
     window.removeEventListener('gamepaddisconnected', this.refreshPads)
 
     this.loop = false
-  }
+  },
 }
 </script>
 

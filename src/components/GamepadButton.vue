@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.button">
     <span>B{{ index }}&nbsp;</span>
-    <input :class="$style.input" type="text" name="note" v-model="value">
+    <input :class="$style.input" type="text" name="note" v-model="value" />
     <span>{{ button.pressed ? '🟢' : '🔴' }}</span>
   </div>
 </template>
@@ -11,25 +11,25 @@ export default {
   props: {
     button: Object,
     index: Number,
-    note: String
+    note: String,
   },
   computed: {
     value: {
-      get () {
+      get() {
         return this.note
       },
-      set (value) {
+      set(value) {
         this.$emit('map', value)
-      }
-    }
+      },
+    },
   },
   watch: {
-    'button.pressed' (pressed, old) {
+    'button.pressed'(pressed, old) {
       if (!old && pressed) {
         this.$emit('press', this.button.value)
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

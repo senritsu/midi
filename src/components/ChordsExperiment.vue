@@ -21,7 +21,9 @@ import { Chord } from '@tonaljs/tonal'
 
 import ChordKeyboard from './ChordKeyboard.vue'
 
-const chords = Scale.scaleChords("C4 major").map(chord => Chord.getChord(chord, "C4"))
+const chords = Scale.scaleChords('C4 major').map((chord) =>
+  Chord.getChord(chord, 'C4'),
+)
 </script>
 
 <style module>

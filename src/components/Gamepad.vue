@@ -7,48 +7,79 @@
     </h4>
     <template v-if="showDetails">
       <div :class="$style.mappings">
-        <span v-if="activeMappingIndex > 0">{{ mappingNames[activeMappingIndex - 1] }}</span>
-        <button :class="$style.previous" :disabled="activeMappingIndex <= 0" @click="activeMappingIndex--">◀</button>
+        <span v-if="activeMappingIndex > 0">{{
+          mappingNames[activeMappingIndex - 1]
+        }}</span>
+        <button
+          :class="$style.previous"
+          :disabled="activeMappingIndex <= 0"
+          @click="activeMappingIndex--"
+        >
+          ◀
+        </button>
         <div :class="$style.active">
-          <input :value="activeMapping.name" @input="set('name', $event.target.value)" />
+          <input
+            :value="activeMapping.name"
+            @input="set('name', $event.target.value)"
+          />
           <small>{{ Object.keys(activeMapping).length - 1 }} mappings</small>
         </div>
-        <button :class="$style.next" v-if="activeMappingIndex < mappingNames.length - 1" @click="activeMappingIndex++">▶</button>
+        <button
+          :class="$style.next"
+          v-if="activeMappingIndex < mappingNames.length - 1"
+          @click="activeMappingIndex++"
+        >
+          ▶
+        </button>
         <button :class="$style.new" v-else @click="addNewMapping">➕</button>
-        <span v-if="activeMappingIndex < mappingNames.length - 1">{{ mappingNames[activeMappingIndex + 1] }}</span>
+        <span v-if="activeMappingIndex < mappingNames.length - 1">{{
+          mappingNames[activeMappingIndex + 1]
+        }}</span>
       </div>
       <div :class="$style.buttons">
         <GamepadButton
-          v-for="(button, i) in pad.buttons" :key="i"
-          :button="button" :index="i"
+          v-for="(button, i) in pad.buttons"
+          :key="i"
+          :button="button"
+          :index="i"
           :note="activeMapping[`button-${i}`]"
           @press="onButtonPress(i, $event)"
           @map="onMapButton(i, $event)"
         />
         <p :class="$style.hint">
-          Normal note names can be used for mapping, e.g. <strong>C3</strong>, <strong>D#4</strong> or <strong>Ab2</strong>
+          Normal note names can be used for mapping, e.g. <strong>C3</strong>,
+          <strong>D#4</strong> or <strong>Ab2</strong>
         </p>
         <p :class="$style.hint">
-          Special values <strong>-</strong> and <strong>+</strong> can be used for quick-switching to the previous or next mapping.
+          Special values <strong>-</strong> and <strong>+</strong> can be used
+          for quick-switching to the previous or next mapping.
         </p>
       </div>
       <div :class="$style.axes">
         <GamepadAxis
-          v-for="(value, i) in pad.axes" :key="i"
-          :value="value" :index="i"
+          v-for="(value, i) in pad.axes"
+          :key="i"
+          :value="value"
+          :index="i"
           :control="activeMapping[`axis-${i}`]"
           @change="onAxisChange(i, $event)"
           @map="onMapAxis(i, $event)"
         />
         <p :class="$style.hint">
-          An axis mapped to the special value <strong>velocity</strong> will determine global note velocity, otherwise analog buttons set their own velocity and digital buttons always send max velocity.
+          An axis mapped to the special value <strong>velocity</strong> will
+          determine global note velocity, otherwise analog buttons set their own
+          velocity and digital buttons always send max velocity.
         </p>
       </div>
       <div :class="$style.io">
         <a :href="exportUrl" :download="`${pad.id}.json`">Download as JSON</a>
         <span :class="$style.import">
           <label>Import from JSON</label>
-          <input type="file" @change="importFromJson" accept="application/json" />
+          <input
+            type="file"
+            @change="importFromJson"
+            accept="application/json"
+          />
         </span>
       </div>
     </template>
@@ -62,44 +93,44 @@ import GamepadAxis from './GamepadAxis.vue'
 export default {
   components: {
     GamepadButton,
-    GamepadAxis
+    GamepadAxis,
   },
   props: {
-    pad: { type: Object, required: true }
+    pad: { type: Object, required: true },
   },
-  data () {
+  data() {
     return {
       showDetails: false,
       mappings: [],
       activeMappingIndex: 0,
-      velocity: null
+      velocity: null,
     }
   },
   computed: {
-    activeMapping () {
+    activeMapping() {
       return this.mappings[this.activeMappingIndex]
     },
-    mappingNames () {
-      return this.mappings.map(x => x.name)
+    mappingNames() {
+      return this.mappings.map((x) => x.name)
     },
-    exportUrl () {
+    exportUrl() {
       const json = JSON.stringify(this.mappings, null, 2)
       const blob = new Blob([json], { type: 'application/json' })
       return URL.createObjectURL(blob)
-    }
+    },
   },
   methods: {
-    onMapButton (index, note) {
+    onMapButton(index, note) {
       const key = `button-${index}`
 
       this.set(key, note)
     },
-    onMapAxis (index, control) {
+    onMapAxis(index, control) {
       const key = `axis-${index}`
 
       this.set(key, control)
     },
-    set (key, value) {
+    set(key, value) {
       const mapping = this.mappings[this.activeMappingIndex]
 
       if (!value) {
@@ -110,11 +141,15 @@ export default {
 
       this.persist()
 
-      if (!Object.entries(mapping).some(([key, value]) => key.startsWith('axis') && value === 'velocity')) {
+      if (
+        !Object.entries(mapping).some(
+          ([key, value]) => key.startsWith('axis') && value === 'velocity',
+        )
+      ) {
         this.velocity = null
       }
     },
-    onButtonPress (index, value) {
+    onButtonPress(index, value) {
       const note = this.activeMapping[`button-${index}`]
 
       switch (note) {
@@ -134,31 +169,32 @@ export default {
           break
         }
         default: {
-          const velocity = this.velocity !== null
-            ? this.velocity
-            : value
+          const velocity = this.velocity !== null ? this.velocity : value
 
           this.$emit('play', { note, velocity })
         }
       }
     },
-    onAxisChange (index, value) {
+    onAxisChange(index, value) {
       const control = this.activeMapping[`axis-${index}`]
 
       if (control === 'velocity') {
         this.velocity = value * 0.5 + 0.5
       }
     },
-    addNewMapping () {
+    addNewMapping() {
       this.mappings.push({ name: 'new' })
       this.activeMappingIndex = this.mappings.length - 1
 
       this.persist()
     },
-    persist () {
-      localStorage.setItem(`midi-mappings-${this.pad.id}`, JSON.stringify(this.mappings))
+    persist() {
+      localStorage.setItem(
+        `midi-mappings-${this.pad.id}`,
+        JSON.stringify(this.mappings),
+      )
     },
-    async importFromJson (event) {
+    async importFromJson(event) {
       if (!event.target.files.length) return
 
       const file = event.target.files.item(0)
@@ -170,23 +206,26 @@ export default {
       this.persist()
 
       event.target.value = null
-    }
+    },
   },
   watch: {
-    exportUrl (url, oldUrl) {
+    exportUrl(url, oldUrl) {
       if (oldUrl) {
         URL.revokeObjectURL(oldUrl)
       }
-    }
+    },
   },
-  mounted () {
+  mounted() {
     const storedMappings = localStorage.getItem(`midi-mappings-${this.pad.id}`)
 
-    this.mappings = storedMappings !== null ? JSON.parse(storedMappings) : [{ name: 'default' }]
+    this.mappings =
+      storedMappings !== null
+        ? JSON.parse(storedMappings)
+        : [{ name: 'default' }]
   },
-  unmounted () {
+  unmounted() {
     URL.revokeObjectURL(this.exportUrl)
-  }
+  },
 }
 </script>
 

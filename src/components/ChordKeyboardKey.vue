@@ -1,16 +1,13 @@
 <template>
-  <div
-    class="note"
-    :class="{white: !black, black, active}"
-  />
+  <div class="note" :class="{ white: !black, black, active }" />
 </template>
 
 <script>
 export default {
   props: {
     active: Boolean,
-    black: Boolean
-  }
+    black: Boolean,
+  },
 }
 </script>
 

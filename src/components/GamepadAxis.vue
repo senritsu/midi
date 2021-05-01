@@ -2,9 +2,17 @@
   <div :class="$style.axis">
     <div :class="$style.text">A{{ index }}: {{ value.toFixed(2) }}</div>
     <div :class="$style.bar">
-      <div :class="$style.marker" :style="{ left: `${(0.5 * value + 0.5) * 100}%`}" />
+      <div
+        :class="$style.marker"
+        :style="{ left: `${(0.5 * value + 0.5) * 100}%` }"
+      />
     </div>
-    <input :class="$style.input" type="text" name="note" v-model="controlModel">
+    <input
+      :class="$style.input"
+      type="text"
+      name="note"
+      v-model="controlModel"
+    />
   </div>
 </template>
 
@@ -13,21 +21,25 @@ export default {
   props: {
     value: Number,
     index: Number,
-    control: String
+    control: String,
   },
   computed: {
     controlModel: {
-      get () { return this.control },
-      set (value) { this.$emit('map', value) }
-    }
+      get() {
+        return this.control
+      },
+      set(value) {
+        this.$emit('map', value)
+      },
+    },
   },
   watch: {
-    value (value, old) {
+    value(value, old) {
       if (value !== old) {
         this.$emit('change', value)
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

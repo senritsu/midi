@@ -8,10 +8,13 @@
     <router-link to="/gamepad-midi">Gamepad MIDI</router-link>
     <router-link to="/chords">Chords</router-link>
   </nav>
-  
+
   <router-view class="content" />
-  
-  <h5>Prototype | source available on <a href="https://github.com/senritsu/midi">GitHub</a></h5>
+
+  <h5>
+    Prototype | source available on
+    <a href="https://github.com/senritsu/midi">GitHub</a>
+  </h5>
 </template>
 
 <script setup>
@@ -64,9 +67,9 @@ nav {
 nav > a {
   margin: 0.5em;
   text-decoration: none;
-  
+
   color: gray;
-  
+
   border-bottom: 1px solid transparent;
   border-top: 1px solid transparent;
 }
