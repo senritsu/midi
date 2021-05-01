@@ -10,5 +10,6 @@ export default createRouter({
     { path: '/', component: Home },
     { path: '/gamepad-midi', component: GamepadMidiMapping },
     { path: '/chords', component: ChordsExperiment },
+    { path: '/redirect', component: () => import('./components/MidiRedirect.vue') },
   ]
 })

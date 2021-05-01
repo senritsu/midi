@@ -7,6 +7,7 @@
     <router-link to="/">Home</router-link>
     <router-link to="/gamepad-midi">Gamepad MIDI</router-link>
     <router-link to="/chords">Chords</router-link>
+    <router-link to="/redirect">MIDI Redirect</router-link>
   </nav>
 
   <router-view class="content" />
