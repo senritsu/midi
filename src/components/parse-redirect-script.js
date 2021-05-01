@@ -2,7 +2,7 @@
 10:36 => 1:24
 10:38 => 1:26
 */
-const redirectRegex = /(?<channel1>\d+):(?<note1>\d+)\s*=>\s*(?<channel2>\d+):(?<note2>\d+)/
+const redirectRegex = /^(?<channel1>\d+):(?<note1>\d+)\s*=>\s*(?<channel2>\d+):(?<note2>\d+)$/
 
 export default function (script) {
   const redirects = {}

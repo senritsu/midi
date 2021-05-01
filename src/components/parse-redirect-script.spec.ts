@@ -14,11 +14,11 @@ describe('parseRedirectScript', () => {
     expect(redirects[0][2]).toEqual([2, 4])
   })
 
-  it('should ignore empty lines', () => {
+  it('should ignore empty lines and comments', () => {
     const script = `
 1:2 => 3:4
 
-
+# 3:4 => 10:11
 5:6 => 7:8
 `
     const redirects = parseRedirectScript(script)
