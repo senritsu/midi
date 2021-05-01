@@ -34,7 +34,6 @@ export default function useWebMidi () {
         }
       }
 
-      console.log(inputs.value)
       state.value = 'connected'
     } catch (error) {
       console.error(`midi access failed: ${error}`)
