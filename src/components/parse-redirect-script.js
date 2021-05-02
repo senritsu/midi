@@ -2,29 +2,46 @@
 10:36 => 1:24
 10:38 => 1:26
 */
-const redirectRegex = /^(?<channel1>\d+):(?<note1>\d+)\s*=>\s*(?<channel2>\d+):(?<note2>\d+)$/
+const commentRegex = /^\s*#.*$/
+const aliasRegex = /^alias (?<definitions>([^\s=,]+=[^\s=,]+,?)+)$/
+const redirectRegex = /^(?<fromChannel>\d+):(?<fromNote>\d+)\s*=>\s*(?<toChannel>\d+):(?<toNote>\d+)$/
 
 export default function (script) {
+  const aliases = {}
   const redirects = {}
 
   const lines = script.split('\n').filter((x) => x)
 
   for (const line of lines) {
+    if (line.match(commentRegex)) continue
+
+    const aliasMatch = line.match(aliasRegex)
+    if (aliasMatch) {
+      aliasMatch.groups.definitions.split(',').forEach(aliasDefinition => {
+        const [from, to] = aliasDefinition.split('=')
+        aliases[from] = to
+      })
+    }
+
+    Object.entries(aliases).forEach(([from, to]) => {
+      line = line.replaceAll(from, to)
+    })
+
     const match = line.match(redirectRegex)
 
     if (!match) continue
 
-    const { channel1, note1, channel2, note2 } = match.groups
-    const zeroBasedChannel1 = parseInt(channel1) - 1
-    const zeroBasedChannel2 = parseInt(channel2) - 1
+    const { fromChannel, fromNote, toChannel, toNote } = match.groups
+    const zeroBasedfromChannel = parseInt(fromChannel) - 1
+    const zeroBasedtoChannel = parseInt(toChannel) - 1
 
-    if (!(zeroBasedChannel1 in redirects)) {
-      redirects[zeroBasedChannel1] = {}
+    if (!(zeroBasedfromChannel in redirects)) {
+      redirects[zeroBasedfromChannel] = {}
     }
 
-    redirects[zeroBasedChannel1][note1] = [
-      zeroBasedChannel2,
-      parseInt(note2),
+    redirects[zeroBasedfromChannel][fromNote] = [
+      zeroBasedtoChannel,
+      parseInt(toNote),
     ]
   }
 

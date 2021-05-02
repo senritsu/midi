@@ -28,7 +28,7 @@
         v-model="script"
         rows="20"
         cols="80"
-        :placeholder="'# this is a comment\n# each line can contain one redirect\n# channel:note => channel:note\n2:1 => 1:1\n# channel goes from 1 to 16, note goes from 0 to 127\n1:0 => 16:127\n\n# empty lines are ok\n\n10:42 => 5:21'"
+        :placeholder="'# this is a comment\n# each line can contain one redirect\n# channel:note => channel:note\n2:1 => 1:1\n# channel goes from 1 to 16, note goes from 0 to 127\n1:0 => 16:127\n\n# empty lines are ok\n\n10:42 => 5:21\n\n# you can also define aliases to use in subsequent redirects\nalias MiddleC=60\nalias FavoriteChannel=3,BestCombo=1:127\n\n1:MiddleC => FavoriteChannel:MiddleC\n2:MiddleC => BestCombo\n'"
       />
 
       <MidiNoteRedirect
