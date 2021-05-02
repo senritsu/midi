@@ -13,7 +13,7 @@ export default {
       required: true,
     },
     modelValue: {
-      type: String,
+      validator: (x) => x === null || typeof x === 'string',
       required: true,
     },
   },
