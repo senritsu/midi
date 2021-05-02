@@ -12,7 +12,7 @@ export default function (script) {
 
   const lines = script.split('\n').filter((x) => x)
 
-  for (const line of lines) {
+  for (let line of lines) {
     if (line.match(commentRegex)) continue
 
     const aliasMatch = line.match(aliasRegex)
