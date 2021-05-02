@@ -4,7 +4,7 @@
 */
 const commentRegex = /^\s*#.*$/
 const aliasRegex = /^alias (?<definitions>([^\s=,]+=[^\s=,]+,?)+)$/
-const redirectRegex = /^(?<fromChannel>\d+):(?<fromNote>\d+)\s*=>\s*(?<toChannel>\d+):(?<toNote>\d+)$/
+const redirectRegex = /^(?<fromChannel>\d+):(?:(?<isFromCC>CC)?(?<fromNote>\d+)|(?<isFromPitchBend>PB))\s*=>\s*(?<toChannel>\d+):(?:(?<isToCC>CC)?(?<toNote>\d+)|(?<isToPitchBend>PB))$/
 
 export default function (script) {
   const aliases = {}
@@ -31,15 +31,46 @@ export default function (script) {
 
     if (!match) continue
 
-    const { fromChannel, fromNote, toChannel, toNote } = match.groups
+    const { fromChannel, fromNote, toChannel, toNote, isFromCC, isToCC, isFromPitchBend, isToPitchBend } = match.groups
+
+    if (isFromCC !== isToCC) {
+      console.error(`CC can only be mapped to CC, invalid rule: ${line}`)
+      continue
+    }
+
+    if (isFromPitchBend !== isToPitchBend) {
+      console.error(`pitch bend can only be mapped to pitch bend, invalid rule: ${line}`)
+      continue
+    }
+
     const zeroBasedfromChannel = parseInt(fromChannel) - 1
     const zeroBasedtoChannel = parseInt(toChannel) - 1
 
-    if (!(zeroBasedfromChannel in redirects)) {
-      redirects[zeroBasedfromChannel] = {}
+    // pitch bend
+    if (isFromPitchBend) {
+      if (!redirects.pb) {
+        redirects.pb = {}
+      }
+
+      redirects.pb[zeroBasedfromChannel] = zeroBasedtoChannel
+      continue
     }
 
-    redirects[zeroBasedfromChannel][fromNote] = [
+    // cc special case
+    if (isFromCC && !redirects.cc) {
+      redirects.cc = {}
+    }
+
+    const applicableRedirects = isFromCC
+      ? redirects.cc
+      : redirects
+
+    // same for cc and note on/off
+    if (!(zeroBasedfromChannel in applicableRedirects)) {
+      applicableRedirects[zeroBasedfromChannel] = {}
+    }
+
+    applicableRedirects[zeroBasedfromChannel][fromNote] = [
       zeroBasedtoChannel,
       parseInt(toNote),
     ]

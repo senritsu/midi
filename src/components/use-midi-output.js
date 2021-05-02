@@ -14,6 +14,12 @@ export default function (outputPort) {
     },
     sendNoteOff(note, velocity = 127, channel = 0) {
       outputPort.send([0x80 + channel, note, velocity])
+    },
+    sendCC(controller, value, channel = 0) {
+      outputPort.send([0xB0 + channel, controller, value])
+    },
+    sendPitchBend(lsb, msb, channel = 0) {
+      outputPort.send([0xE0 + channel, lsb, msb])
     }
   }
 }

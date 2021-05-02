@@ -19,27 +19,54 @@ const props = defineProps({
   redirects: { Object, required: true },
 })
 
-const { connected: outputConnected, sendNoteOn, sendNoteOff } = useMidiOutput(
-  props.output,
-)
+const {
+  connected: outputConnected,
+  sendNoteOn,
+  sendNoteOff,
+  sendCC,
+  sendPitchBend,
+} = useMidiOutput(props.output)
 const { connected: inputConnected } = useMidiInput(props.input, {
   onNoteOn: (note, velocity, channel) => {
-    if (channel in props.redirects) {
-      if (note in props.redirects[channel]) {
-        const [newChannel, newNote] = props.redirects[channel][note]
-
-        sendNoteOn(newNote, velocity, newChannel)
-      }
+    if (!props.redirects[channel] || !props.redirects[channel][note]) {
+      return
     }
+
+    const [newChannel, newNote] = props.redirects[channel][note]
+
+    sendNoteOn(newNote, velocity, newChannel)
   },
   onNoteOff: (note, velocity, channel) => {
-    if (channel in props.redirects) {
-      if (note in props.redirects[channel]) {
-        const [newChannel, newNote] = props.redirects[channel][note]
-
-        sendNoteOff(newNote, velocity, newChannel)
-      }
+    if (!props.redirects[channel] || !props.redirects[channel][note]) {
+      return
     }
+
+    const [newChannel, newNote] = props.redirects[channel][note]
+
+    sendNoteOff(newNote, velocity, newChannel)
+  },
+  onCC: (controller, value, channel) => {
+    if (
+      !props.redirects.cc[channel] ||
+      !props.redirects.cc[channel][controller]
+    ) {
+      return
+    }
+
+    const [newChannel, newController] = props.redirects.cc[channel][controller]
+
+    sendCC(newController, value, newChannel)
+  },
+  onPitchBend: (lsb, msb, channel) => {
+    if (!props.redirects.pb[channel]) {
+      return
+    }
+
+    const newChannel = props.redirects.pb[channel]
+
+    console.log({ lsb, msb, channel })
+
+    sendPitchBend(lsb, msb, newChannel)
   },
 })
 </script>

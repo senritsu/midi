@@ -1,5 +1,5 @@
 # this is a comment
-# each line can contain one redirect, written as:
+# each line can contain one note redirect, written as:
 # channel:note => channel:note
 2:1 => 1:1
 # channel goes from 1 to 16, note goes from 0 to 127
@@ -17,3 +17,7 @@ alias FavoriteChannel=3,BestCombo=1:127
 1:MiddleC => FavoriteChannel:MiddleC
 2:MiddleC => BestCombo
 FavoriteChannel:77 => 12:13
+
+# CC and pitch bend can also be redirected
+2:CC3 => 5:CC2
+2:PB => 5:PB
